@@ -1,8 +1,13 @@
+# This program is the main feature of
+# ONE STOP INSURANCE COMPANY's Policy Registration Software.
+# It allows the user to register and save information to the ONE STOP INSURANCE COMPANY database
+# About new customers and their insurance policies.
+
 # Import libraries
 import datetime
+from datetime import date
 import time
-
-#REMOVE UNNEEDED FALSE CHECKS
+from datetime import timedelta
 
 # Prevents empty user inputs or null strings.
 def blank(x):  # Accepts any variable
@@ -11,21 +16,19 @@ def blank(x):  # Accepts any variable
     else:
         return False
 
-
+# Build allowable characters for user input
 def allow(x):
     allow = "abcdefghijklmnopqrstuvwxyz01234567890,.- '"
     return set(x.lower()).issubset(allow)
 
-
+# Allows user to end program with 'END'
 def escape(x):
     if x.upper() == "END":
         quit()
 
-
+# Format dollar value strings
 def cur(x):
     return "${:,.2f}".format(x)
-
-
 
 # Open default file, read values
 d = open("OSICDef.dat", "r")
@@ -37,12 +40,17 @@ GLASS_COV = float(d.readline())
 LOAN_COV = float(d.readline())
 TAX_RATE = float(d.readline())
 PROC_FEE = float(d.readline())
+d.close()
 
-# User data inputs
+# Gather user data
 while True:
-    print("Customer data entry")
-    print("Type 'END' at any time to quit without saving.")
-    print("===================")
+    print("--------------------------------")
+    print("|  ONE STOP INSURANCE COMPANY  |")
+    print("| Policy Registration Software |")
+    print("|------------------------------|")
+    print("|    Type 'END' at any time    |\n|    to quit without saving.   |")
+    print("================================")
+    print()
     while True:
         custFName = input("First Name: ")
         escape(custFName)
@@ -122,8 +130,10 @@ while True:
         escape(liabOpt)
         if blank(liabOpt) == False:
             if liabOpt == "Y":
+                liabOpt2 = "Covered"
                 break
             elif liabOpt == "N":
+                liabOpt2 = "Not Covered"
                 break
             else:
                 print("Input not recognized.")
@@ -132,8 +142,10 @@ while True:
         escape(glassOpt)
         if blank(glassOpt) == False:
             if glassOpt == "Y":
+                glassOpt2 = "Covered"
                 break
             elif glassOpt == "N":
+                glassOpt2 = "Not Covered"
                 break
             else:
                 print("Input not recognized")
@@ -142,32 +154,32 @@ while True:
         escape(loanOpt)
         if blank(loanOpt) == False:
             if loanOpt == "Y":
+                loanOpt2 = "Covered"
                 break
             elif loanOpt == "N":
+                loanOpt2 = "Not Covered"
                 break
             else:
                 print("Input not recognized")
     while True:
-        paySched = input("Payment in full or monthly [F or M]: ").upper()
-        escape(paySched)
-        if blank(paySched) == False:
-            if paySched == "M":
-                monthCheck = True
+        monthPay = input("Payment in full or monthly [F or M]: ").upper()
+        escape(monthPay)
+        if blank(monthPay) == False:
+            if monthPay == "M":
                 break
-            elif paySched == "F":
-                monthCheck = False
+            elif monthPay == "F":
                 break
             else:
                 print("Input not recognized.")
 
-    # Processing
+    # Process user data
     liabCov = 0
     glassCov = 0
     loanCov = 0
-    monthPay = 0
+    monthPayDsp = 0
     discCar = BASIC_PREM - (BASIC_PREM * ADD_DISC)
     if numCar >= 2:
-        custPrem = BASIC_PREM + (discCar * (numCar-1))
+        custPrem = BASIC_PREM + (discCar * (numCar - 1))
     else:
         custPrem = BASIC_PREM
     if liabOpt == "Y":
@@ -178,15 +190,17 @@ while True:
         loanCov = 58 * numCar
     totExtra = loanCov + glassCov + liabCov
     totPrem = custPrem + totExtra
-    totalCost = totPrem + (totPrem * TAX_RATE)
-    if monthCheck == True:
-        monthPay = (totalCost + PROC_FEE) / 12
+    taxAmt = totPrem * TAX_RATE
+    totalCost = totPrem + taxAmt
+    if monthPay == "M":
+        monthPayDsp = (totalCost + PROC_FEE) / 12
+    policyNum = str(POLICY_NUM) + "-" + custFName[0].upper() + custLName[0].upper()
+    policyDate = date.today()
 
-    # Write file
-    save = input("Type 'END' to quit without saving, or any other key continue.").upper()
-    escape(save)
+    # Write user input to file
     p = open("Policies.dat", "a")
-    p.write("{}, ".format(str(POLICY_NUM)))
+    p.write("{}, ".format(str(policyNum)))
+    p.write("{}, ".format(str(policyDate)))
     p.write("{}, ".format(str(custFName)))
     p.write("{}, ".format(str(custLName)))
     p.write("{}, ".format(str(custAdd)))
@@ -194,50 +208,117 @@ while True:
     p.write("{}, ".format(str(custPhone)))
     p.write("{}, ".format(str(custProv)))
     p.write("{}, ".format(str(custPost)))
-    p.write("{}, ".format(str(custPhone)))
     p.write("{}, ".format(str(numCar)))
     p.write("{}, ".format(str(liabOpt)))
     p.write("{}, ".format(str(glassOpt)))
     p.write("{}, ".format(str(loanOpt)))
-    p.write("{}, ".format(str(paySched)))
-    p.write("{}\n ".format(str(round(totPrem, 2))))
-    print("Processing...")
-    time.sleep(1)
-    print("Saving...")
-    time.sleep(1)
-    print()
-    print("Policy processed and saved.")
+    p.write("{}, ".format(str(monthPay)))
+    p.write("{}\n".format(str(round(totPrem, 2))))
+    p.close()
 
-    #Format
-    liabCov = cur(liabCov)
-    glassCov = cur(glassCov)
-    loanCov = cur(loanCov)
-    custPrem = cur(custPrem)
-    totExtra = cur(totExtra)
-    totPrem = cur(totPrem)
-    monthPay = cur(monthPay)
-    procFee = cur(PROC_FEE)
 
-    print("Generating reciept...")
-    time.sleep(1)
-    print()
-    print()
+    # Format calculations for receipt printout
+    basicCovDsp = cur(BASIC_PREM)
+    discCarDsp = cur(discCar)
+    liabCovDsp = cur(liabCov)
+    glassCovDsp = cur(glassCov)
+    loanCovDsp = cur(loanCov)
+    custPremDsp = cur(custPrem)
+    totExtraDsp = cur(totExtra)
+    totPremDsp = cur(totPrem)
+    monthPayDsp = cur(monthPayDsp)
+    procFeeDsp = cur(PROC_FEE)
+    taxAmtDsp = cur(taxAmt)
+    totalCostDsp = cur(totalCost)
+
 
     # Generate receipt
-    print("         1         2         3         4")
+    print()
+    print()
+    print()
+    print("0        1         2         3         4")
     print("1234567890123456789012345678901234567890")
-    print("{^40}".format("ONE STOP INSURANCE COMPANY"))
-    print("Date: {}            HST#: 222-32-809-322".format("dd-MON-yy")) #FIX THIS
-    print("="*40)
-    print("Customer Details: ")
     print()
-    print("{}{}".format(custFName, custLName))
-    print("{}".format(custPhone))
-    print("{}".format(custAdd))
-    print("{}{}".format(custCity, custProv))
-    print("{}".format(custPost))
+    print("=" * 40)
+    print("{:^40}".format("ONE STOP INSURANCE COMPANY"))
+    print("=" * 40)
+    print("{:^40}".format("Date: "+ str(policyDate)))
+    print("-" * 40)
+    print("{:^40}".format("CUSTOMER DETAILS"))
+    print("--" * 20)
     print()
-    print("Policy Details: ")
+    print(" {:^40}".format(custFName + " " + custLName))
+    print("{:^40}".format(custPhone))
+    print("{:^40}".format(custAdd))
+    print("{:^40}".format(custCity + ", " + custProv))
+    print("{:^40}".format(custPost))
+    print()
+    print("--" * 20)
+    print("{:^40}".format("POLICY #{}".format(policyNum)))
+    print("--" * 20)
+    print()
+    if numCar == 1:
+        print("Auto Insured: {:>26}".format(numCar))
+    else:
+        print("Autos Insured: {:>25}".format(numCar))
+    print("   Auto 1: {:>28})".format("(" + basicCovDsp))
+    autoRange = range(1, numCar)
+    for numCar in autoRange:
+        if numCar <= 8:
+            print("   Auto{:>2}:{:>30}".format(numCar + 1, "(" + discCarDsp + ")"))
+        elif 9 <= numCar <= 98:
+            print("   Auto{:>3}:{:>29}".format(numCar + 1, "(" + discCarDsp+ ")"))
+        elif 99 <= numCar <= 998:
+            print("   Auto{:>4}:{:>29}".format(numCar + 1, "(" + discCarDsp + ")"))
+        elif 999 <= numCar <= 9998:
+            print("   Auto{:>5}:{:>28}".format(numCar + 1, "(" + discCarDsp + ")"))
+        elif 9999 <= numCar <= 99998:
+            print("   Auto{:>6}:{:>27}".format(numCar + 1, "(" + discCarDsp + ")"))
+        elif 99999 <= numCar <= 999998:
+            print("   Auto{:>7}:{:>26}".format(numCar + 1, "(" + discCarDsp + ")"))
+        elif numCar >= 999999:
+            print("   Autos registered\n   out of printable range.")
+    print()
+    print("Extra Liability: {:>23}".format(liabOpt2))
+    print("{}{:>25})".format("($130.00/Auto)", "(" + liabCovDsp))
+    print()
+    print("Glass Coverage: {:>24}".format(glassOpt2))
+    print("{}{:>26})".format("($86.00/Auto)", "(" + glassCovDsp))
+    print()
+    print("Loan Coverage: {:>25}".format(loanOpt2))
+    print("{}{:>26})".format("($58.00/Auto)", "(" + loanCovDsp))
+    print()
+    print("--" * 20)
+    print("{:^40}".format("BILLING DETAILS"))
+    print("--" * 20)
+    print()
+    print("Premium Total: {:>25}".format(custPremDsp))
+    print("Add-On Total: {:>26}".format(totExtraDsp))
+    print("{:>40}".format("---------"))
+    print("Subtotal: {:>30}".format(totPremDsp))
+    print("Taxes: {:>33}".format(taxAmtDsp))
+    print("{:>40}".format("---------"))
+    print("Total Cost: {:>28}".format(totalCostDsp))
+    print()
+    print("--" * 20)
+    print("{:^40}".format("BILLING DETAILS"))
+    print("--" * 20)
+    print()
+    if monthPay == "F":
+        print("Payment Option Selected: {:>15}".format("In Full"))
+    elif monthPay == "M":
+        print("Payment Option Selected: {:>15}".format("Monthly"))
+        print("Processing Fee: {:>24}".format(procFeeDsp))
+        print("")
+        print("Monthly Payment Amount: {:>16}".format(monthPayDsp))
+        print("First Payment On: {:>22}".format('DD-MM-YYYY'))
+        print()
+    print("==" * 20)
+    print("{:^40}".format("THANK YOU"))
+    print("==" * 20)
+    print()
+    print()
+    print()
 
     # Open default file, write values
     POLICY_NUM += 1  # Increase policy number
@@ -250,3 +331,8 @@ while True:
     d.write("{}\n".format(str(LOAN_COV)))
     d.write("{}\n".format(str(TAX_RATE)))
     d.write("{}\n".format(str(PROC_FEE)))
+    d.close()
+    break
+
+
+
