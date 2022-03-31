@@ -1,9 +1,12 @@
 Hello Mo,
 
-Attached is the file for QAP 4. I decided to create different python files for this project in lieu of writing it all
-within the main.py file.
+Attached is the file for QAP 4.
 
-As such, I have provided a simple menu file that will allow you to access each of different programs with ease.
+I decided ultimately to define the reports as functions and call on them in the main.py program for ease of use.
+
+I ran into an issue with importing separate .py files where you could not run an imported file twice without exiting and
+restarting the program. I found some solutions online but they fell outside the scope of the project so I figured why
+not just do it the way we were taught!
 
 Thanks,
 Glen

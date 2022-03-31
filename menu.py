@@ -1,6 +1,6 @@
 while True:
     print()
-    print("Hello, welcome to the ONE STOP INSURANCE COMPANY Policy Registration Software. ")
+    print("Welcome to the ONE STOP INSURANCE COMPANY Policy Registration Software. ")
     print()
     print("Please select from the following options: ")
     print()
@@ -16,27 +16,29 @@ while True:
             print()
             import main
             break
-        elif select == "2":
+        if select == "2":
             print()
             print()
             try:
                 import PolicyReport
+                break
             except:
                 print()
                 print("Data file empty. ")
                 print("Please register policies before printing reports.")
             break
-        elif select == "3":
+        if select == "3":
             print()
             print()
             try:
                 import MonthlyReport
+                break
             except:
                 print()
                 print("Data file empty. ")
                 print("Please register policies before printing reports.")
             break
-        elif select == "4":
+        if select == "4":
             quit()
         else:
             print("Input not recognized.")

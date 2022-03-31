@@ -21,7 +21,8 @@ LOAN_COV = float(d.readline())
 TAX_RATE = float(d.readline())
 PROC_FEE = float(d.readline())
 d.close()
-policyDate = date.today()
+curDate = datetime.datetime.now()
+policyDate = curDate.strftime('%d-%b-%y')
 
 # Display report headings
 print("0        1         2         3         4         5         6         7")
